@@ -1,4 +1,11 @@
 package me.arwan.calculator
+
+import me.arwan.calculator.operations.Addition
+import me.arwan.calculator.operations.Division
+import me.arwan.calculator.operations.Multiplication
+import me.arwan.calculator.operations.SplitEqually
+import me.arwan.calculator.operations.SplitNumber
+import me.arwan.calculator.operations.Subtraction
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,45 +21,58 @@ class CalculatorTest {
     }
 
     @Test
-    fun testAdd() {
-        assertEquals(15, calculator.add(1, 2, 3, 4, 5))
-        assertFailsWith<IllegalArgumentException> { calculator.add() }
+    fun testAddition() {
+        val addition = Addition()
+        assertEquals(10L, calculator.calculate(addition, 1, 2, 3, 4))
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(addition)
+        }
     }
 
     @Test
-    fun testSubtract() {
-        assertEquals(-13, calculator.subtract(1, 2, 3, 4, 5))
-        assertEquals(10, calculator.subtract(10))
+    fun testSubtraction() {
+        val subtraction = Subtraction()
+        assertEquals(-8L, calculator.calculate(subtraction, 1, 2, 3, 4))
+        assertEquals(1L, calculator.calculate(subtraction, 1))
     }
 
     @Test
-    fun testMultiply() {
-        assertEquals(120, calculator.multiply(1, 2, 3, 4, 5))
-        assertEquals(10, calculator.multiply(10))
+    fun testMultiplication() {
+        val multiplication = Multiplication()
+        assertEquals(24L, calculator.calculate(multiplication, 1, 2, 3, 4))
+        assertEquals(1L, calculator.calculate(multiplication, 1))
     }
 
     @Test
-    fun testDivide() {
-        assertEquals(5, calculator.divide(10, 2))
+    fun testDivision() {
+        val division = Division()
+        assertEquals(2L, calculator.calculate(division, 4, 2))
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(division, 4)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(division, 4, 0)
+        }
     }
 
     @Test
-    fun testDivideByZero() {
-        assertFailsWith<IllegalArgumentException> { calculator.divide(10, 0) }
+    fun testSplitEqually() {
+        val splitEqually = SplitEqually()
+        assertEquals("{2, 2}", calculator.calculate(splitEqually, 4, 2))
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(splitEqually, 4)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(splitEqually, 4, 0)
+        }
     }
 
     @Test
-    fun testSplitEq() {
-        assertEquals("{5, 5}", calculator.splitEq(10, 2))
-    }
-
-    @Test
-    fun testSplitEqByZero() {
-        assertFailsWith<IllegalArgumentException> { calculator.splitEq(10, 0) }
-    }
-
-    @Test
-    fun testSplitNum() {
-        assertEquals(40, calculator.splitNum(140, 45, 35, 20))
+    fun testSplitNumber() {
+        val splitNumber = SplitNumber()
+        assertEquals(1L, calculator.calculate(splitNumber, 5, 2))
+        assertFailsWith<IllegalArgumentException> {
+            calculator.calculate(splitNumber, 5)
+        }
     }
 }

@@ -5,7 +5,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import me.arwan.calculator.Calculator
-import me.arwan.enums.OperatorEnum.*
+import me.arwan.calculator.OperationType
 import me.arwan.model.ApiResponse
 import me.arwan.model.NumbersRequest
 
@@ -16,24 +16,14 @@ fun Application.configureCalculatorRouting() {
         post("/{mathematical-operation}") {
             try {
                 val numbers = call.receive<NumbersRequest>().numbers.toLongArray()
-                val result: Any = when (call.parameters["mathematical-operation"]) {
-                    ADD.value -> calculator.add(*numbers)
-                    SUBTRACT.value -> calculator.subtract(*numbers)
-                    MULTIPLY.value -> calculator.multiply(*numbers)
-                    DIVIDE.value -> calculator.divide(*numbers)
-                    SPLIT_EQ.value -> calculator.splitEq(*numbers)
-                    SPLIT_NUM.value -> calculator.splitNum(*numbers)
-                    else -> ""
-                }
+                val mathOperation = call.parameters["mathematical-operation"]
+                val operation = OperationType.fromValue(mathOperation)?.operation?.invoke()
+                val result = operation?.let { calculator.calculate(it, *numbers) }
 
-                if (result != "") {
-                    call.respond(ApiResponse(status = "success", data = result))
-                } else {
-                    call.respond(
-                        ApiResponse(status = "error", data = null, error = "Invalid operations")
-                    )
-                }
-
+                call.respond(
+                    result?.let { ApiResponse(status = "success", data = it) }
+                        ?: ApiResponse(status = "error", data = null, error = "Invalid operations")
+                )
             } catch (e: Exception) {
                 call.respond(
                     ApiResponse(status = "error", data = null, error = e.localizedMessage)
